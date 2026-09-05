@@ -6,8 +6,6 @@ import com.examly.springapp.repository.UserRepo;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.mail.SimpleMailMessage;
-import org.springframework.mail.javamail.JavaMailSender;
 import org.springframework.web.bind.annotation.*;
 
 @RestController
@@ -15,7 +13,7 @@ import org.springframework.web.bind.annotation.*;
 public class PaymentController {
 
     @Autowired
-    private JavaMailSender mailSender;
+    private com.examly.springapp.service.EmailService emailService;
 
     @Autowired
     private UserRepo userRepo;
@@ -32,24 +30,21 @@ public class PaymentController {
                         .body("User email not found");
             }
 
-            SimpleMailMessage message = new SimpleMailMessage();
-            message.setTo(user.getEmail());
-            message.setSubject("DriveU - Payment Confirmation");
-            message.setText(
-                "Dear " + user.getUsername() + ",\n\n" +
-                "Your payment has been received successfully.\n\n" +
-                "----------------------------------------\n" +
-                "Payment ID   : " + req.getPaymentId() + "\n" +
-                "Amount Paid  : Rs. " + req.getAmount() + "\n" +
-                "Driver       : " + req.getDriverName() + "\n" +
-                "Pickup       : " + req.getPickupLocation() + "\n" +
-                "Drop         : " + req.getDropLocation() + "\n" +
-                "----------------------------------------\n\n" +
-                "Thank you for choosing DriveU!\n" +
-                "Your Journey, Our Responsibility."
+            emailService.sendPlainText(
+                    user.getEmail(),
+                    "DriveU - Payment Confirmation",
+                    "Dear " + user.getUsername() + ",\n\n" +
+                    "Your payment has been received successfully.\n\n" +
+                    "----------------------------------------\n" +
+                    "Payment ID   : " + req.getPaymentId() + "\n" +
+                    "Amount Paid  : Rs. " + req.getAmount() + "\n" +
+                    "Driver       : " + req.getDriverName() + "\n" +
+                    "Pickup       : " + req.getPickupLocation() + "\n" +
+                    "Drop         : " + req.getDropLocation() + "\n" +
+                    "----------------------------------------\n\n" +
+                    "Thank you for choosing DriveU!\n" +
+                    "Your Journey, Our Responsibility."
             );
-
-            mailSender.send(message);
 
             return ResponseEntity.ok("Confirmation email sent");
 

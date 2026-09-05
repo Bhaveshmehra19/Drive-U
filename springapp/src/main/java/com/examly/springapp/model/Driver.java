@@ -29,7 +29,7 @@ public class Driver {
     // taken from the copilot
     // Nullable:true
     @Lob
-    @Column(columnDefinition = "LONGBLOB", nullable = true) // Base-64 encoded image fo the driver
+    @Column(columnDefinition = "TEXT", nullable = true) // Base-64 encoded image fo the driver
     private String image;
 
 }

@@ -4,15 +4,13 @@ import java.security.SecureRandom;
 import java.util.concurrent.ConcurrentHashMap;
 
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.mail.SimpleMailMessage;
-import org.springframework.mail.javamail.JavaMailSender;
 import org.springframework.stereotype.Service;
 
 @Service
 public class OtpService {
 
     @Autowired
-    private JavaMailSender mailSender;
+    private EmailService emailService;
 
     private final ConcurrentHashMap<String, OtpEntry> otpStore =
             new ConcurrentHashMap<>();
@@ -41,17 +39,7 @@ public class OtpService {
                         System.currentTimeMillis() + OTP_VALID_MS
                 )
         );
-
-        SimpleMailMessage message = new SimpleMailMessage();
-        message.setTo(email);
-        message.setSubject("DriveU Email Verification Code");
-        message.setText(
-                "Your DriveU verification code is: " + otp +
-                "\n\nThis code is valid for 5 minutes." +
-                "\n\nIf you did not request this, please ignore this email."
-        );
-
-        mailSender.send(message);
+        emailService.sendPlainText(email, "DriveU - Your OTP", "Your OTP is: " + otp + "\nThis OTP is valid for 5 minutes.");
     }
 
     public boolean verifyOtp(String email, String otp) {
