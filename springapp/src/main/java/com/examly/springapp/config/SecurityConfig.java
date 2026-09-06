@@ -106,7 +106,7 @@ public class SecurityConfig {
               
                 "http://localhost:*",
                 "https://localhost:*",
-                "https://*.vercel.app"
+                "https://drive-u-nine.vercel.app"
         ));
 
         configuration.setAllowedMethods(Arrays.asList(
