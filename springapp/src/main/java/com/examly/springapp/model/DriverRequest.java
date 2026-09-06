@@ -34,7 +34,7 @@ public class DriverRequest {
     private boolean isDeleted = false;
 
     @ManyToOne
-    @JoinColumn(name = "userId", nullable = false)
+    @JoinColumn(name = "user_id", nullable = false)
     private User user;
 
     @ManyToOne
