@@ -28,11 +28,23 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
     private MyUserDetailsService userDetailsService;
 
     @Override
+    protected boolean shouldNotFilter(HttpServletRequest request) {
+        String path = request.getServletPath();
+
+        return path.equals("/api/otp/send")
+                || path.equals("/api/otp/verify")
+                || path.equals("/api/login")
+                || path.equals("/api/register")
+                || path.startsWith("/api/chatbot/")
+                || path.startsWith("/swagger-ui/")
+                || path.startsWith("/v3/api-docs/");
+    }
+
+    @Override
     protected void doFilterInternal(
             HttpServletRequest request,
             HttpServletResponse response,
-            FilterChain filterChain
-    ) throws ServletException, IOException {
+            FilterChain filterChain) throws ServletException, IOException {
 
         String token = extractTokenFromCookie(request);
         String email = null;
@@ -48,25 +60,19 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
             }
         }
 
-        if (
-                email != null &&
-                SecurityContextHolder.getContext().getAuthentication() == null
-        ) {
-            UserDetails userDetails =
-                    userDetailsService.loadUserByUsername(email);
+        if (email != null &&
+                SecurityContextHolder.getContext().getAuthentication() == null) {
+            UserDetails userDetails = userDetailsService.loadUserByUsername(email);
 
             if (jwtUtils.validateToken(token, userDetails.getUsername())) {
-                UsernamePasswordAuthenticationToken authenticationToken =
-                        new UsernamePasswordAuthenticationToken(
-                                userDetails,
-                                null,
-                                userDetails.getAuthorities()
-                        );
+                UsernamePasswordAuthenticationToken authenticationToken = new UsernamePasswordAuthenticationToken(
+                        userDetails,
+                        null,
+                        userDetails.getAuthorities());
 
                 authenticationToken.setDetails(
                         new WebAuthenticationDetailsSource()
-                                .buildDetails(request)
-                );
+                                .buildDetails(request));
 
                 SecurityContextHolder
                         .getContext()
